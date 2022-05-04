@@ -123,6 +123,10 @@ public final class Language {
     public String GiveChar_invalid_avatar_level = "Invalid avatar level.";
     public String GiveChar_invalid_avatar_or_player_id = "Invalid avatar or player ID.";
 
+
+    //GiveAllchar
+    public String GiveAllChar_usage = "Usage: giveallchar <playerId> <StellaFortuna level> [level]";
+    public String GiveAllChar_modify_success = "{AvatarId} modification is complete, please log in to the game again!";
     // Give
     public String Give_usage = "Usage: give <player> <itemId|itemName> [amount] [level]";
     public String Give_refinement_only_applicable_weapons = "Refinement is only applicable to weapons.";
@@ -210,10 +214,10 @@ public final class Language {
     public String SetStats_usage_console = "Usage: setstats|stats @<UID> <stat> <value>";
     public String SetStats_usage_ingame = "Usage: setstats|stats [@UID] <stat> <value>";
     public String SetStats_help_message = """
-        \n\tValues for <stat>: hp | maxhp | def | atk | em | er | crate | cdmg | cdr | heal | heali | shield | defi
-        \t(cont.) Elemental DMG Bonus: epyro | ecryo | ehydro | egeo | edendro | eelectro | ephys
-        \t(cont.) Elemental RES: respyro | rescryo | reshydro | resgeo | resdendro | reselectro | resphys
-        """;
+            \n\tValues for <stat>: hp | maxhp | def | atk | em | er | crate | cdmg | cdr | heal | heali | shield | defi
+            \t(cont.) Elemental DMG Bonus: epyro | ecryo | ehydro | egeo | edendro | eelectro | ephys
+            \t(cont.) Elemental RES: respyro | rescryo | reshydro | resgeo | resdendro | reselectro | resphys
+            """;
     public String SetStats_value_error = "Invalid stat value.";
     public String SetStats_uid_error = "Invalid UID.";
     public String SetStats_player_error = "Player not found or offline.";
