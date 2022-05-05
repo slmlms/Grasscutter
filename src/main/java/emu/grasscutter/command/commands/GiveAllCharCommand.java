@@ -15,11 +15,12 @@ import java.util.Objects;
         description = "Gives the player all character", aliases = {"giveallc"}, permission = "player.giveallchar")
 public final class GiveAllCharCommand implements CommandHandler {
 
+
     @Override
-    public void execute(Player sender, List<String> args) {
+    public void execute(Player sender, Player targetPlayer, List<String> args) {
         int stellaFortuna = 0;
         int level = 1;
-        int target = 99999;
+        int target;
         switch (args.size()) {
 
             case 1://playerId
@@ -42,7 +43,7 @@ public final class GiveAllCharCommand implements CommandHandler {
                     }
                     stellaFortuna = reviseStellaFortuna(Integer.parseInt(args.get(1)));
                 } catch (NumberFormatException ignored) {
-                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().GiveAll_invalid_amount_or_playerId);
+                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
                     return;
                 }
                 break;
@@ -55,7 +56,7 @@ public final class GiveAllCharCommand implements CommandHandler {
                     stellaFortuna = reviseStellaFortuna(Integer.parseInt(args.get(1)));
                     level = Integer.parseInt(args.get(2));
                 } catch (NumberFormatException ignored) {
-                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().GiveAll_invalid_amount_or_playerId);
+                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
                     return;
                 }
                 break;
@@ -64,13 +65,13 @@ public final class GiveAllCharCommand implements CommandHandler {
                     target = sender.getUid();
                     break;
                 } else
-                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().GiveAll_invalid_amount_or_playerId);
+                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
                 return;
 
         }
 
-        Player targetPlayer = Grasscutter.getGameServer().getPlayerByUid(target);
-        if (targetPlayer == null) {
+        Player player = Grasscutter.getGameServer().getPlayerByUid(target);
+        if (player == null) {
             CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Player_not_found);
             return;
         }
@@ -80,8 +81,8 @@ public final class GiveAllCharCommand implements CommandHandler {
             if (isTestAvatar(avatarData.getId())) continue;
             Avatar avatar;
             //如果角色存在，则直接修改角色的数据
-            if (targetPlayer.getAvatars().hasAvatar(avatarData.getId())) {
-                avatar = targetPlayer.getAvatars().getAvatarById(avatarData.getId());
+            if (player.getAvatars().hasAvatar(avatarData.getId())) {
+                avatar = player.getAvatars().getAvatarById(avatarData.getId());
                 avatar.setLevel(level);
                 avatar.setPromoteLevel(getPromteLevel(level));
                 avatar.setCoreProudSkillLevel(stellaFortuna);
@@ -98,7 +99,7 @@ public final class GiveAllCharCommand implements CommandHandler {
                 avatar.setLevel(level);
                 avatar.setPromoteLevel(getPromteLevel(level));
                 avatar.setCoreProudSkillLevel(stellaFortuna);
-                boolean result = targetPlayer.getAvatars().addAvatar(avatar);
+                boolean result = player.getAvatars().addAvatar(avatar);
                 if (!result) {
                     CommandHandler.sendMessage(sender, "Failed to add avatar " + avatar.getAvatarId());
                     continue;

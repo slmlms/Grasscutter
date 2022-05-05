@@ -107,7 +107,7 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
-    
+
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
     from('src/main/java') {
@@ -210,7 +210,7 @@ idea {
 eclipse {
     classpath {
         file.whenMerged { cp ->
-            cp.entries.add( new org.gradle.plugins.ide.eclipse.model.SourceFolder('src/generated/main/java', null) )
+            cp.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder('src/generated/main/java', null))
         }
     }
 }
@@ -221,7 +221,7 @@ signing {
 
 javadoc {
     options.encoding = 'UTF-8'
-    if(JavaVersion.current().isJava9Compatible()) {
+    if (JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
 }
