@@ -1,5 +1,7 @@
 package emu.grasscutter.database;
 
+import java.util.List;
+
 import com.mongodb.client.result.DeleteResult;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Sort;
@@ -218,26 +220,22 @@ public final class DatabaseHelper {
         return count / 10 + (count % 10 > 0 ? 1 : 0);
     }
 
-    public static void saveGachaRecord(GachaRecord gachaRecord) {
-        DatabaseManager.getDatastore().save(gachaRecord);
-    }
+	public static void saveGachaRecord(GachaRecord gachaRecord){
+		DatabaseManager.getDatastore().save(gachaRecord);
+	}
+	
+	public static List<Mail> getAllMail(Player player) {
+		return DatabaseManager.getDatastore().find(Mail.class).filter(Filters.eq("ownerUid", player.getUid())).stream().toList();
+	}
+	
+	public static void saveMail(Mail mail) {
+		DatabaseManager.getDatastore().save(mail);
+	}
+	
+	public static boolean deleteMail(Mail mail) {
+		DeleteResult result = DatabaseManager.getDatastore().delete(mail);
+		return result.wasAcknowledged();
+	}
 
-    public static List<Mail> getAllMail(Player player) {
-        return DatabaseManager.getDatastore().find(Mail.class).filter(Filters.eq("ownerUid", player.getUid())).stream().toList();
-    }
-
-    public static void saveMail(Mail mail) {
-        DatabaseManager.getDatastore().save(mail);
-    }
-
-    public static boolean deleteMail(Mail mail) {
-        DeleteResult result = DatabaseManager.getDatastore().delete(mail);
-        return result.wasAcknowledged();
-    }
-
-    public static void updateAvatar(Avatar avatar) {
-        DatabaseManager.getDatastore().merge(avatar);
-    }
-
-    public static char AWJVN = 'e';
+	public static char AWJVN = 'e';
 }
