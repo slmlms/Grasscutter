@@ -1,6 +1,5 @@
 package emu.grasscutter.command.commands;
 
-import emu.grasscutter.Grasscutter;
 import emu.grasscutter.command.Command;
 import emu.grasscutter.command.CommandHandler;
 import emu.grasscutter.data.GameData;
@@ -16,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static emu.grasscutter.utils.Language.translate;
+
 @Command(label = "giveallmaterial", usage = "giveallmaterial  <amount>",
         description = "Gives the player all character", aliases = {"giveallmat"}, permission = "player.giveallmaterial")
 public final class GiveAllMaterialCommand implements CommandHandler {
@@ -27,7 +28,7 @@ public final class GiveAllMaterialCommand implements CommandHandler {
             try {
                 amount = Integer.parseInt(args.get(0));
             } catch (NumberFormatException e) {
-                CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_amount);
+                CommandHandler.sendMessage(sender, translate("commands.generic.invalid.amount"));
             }
         }
         giveAllMaterial(targetPlayer, amount);
@@ -35,7 +36,7 @@ public final class GiveAllMaterialCommand implements CommandHandler {
 
 
     private void giveAllMaterial(Player player, Integer amount) {
-        CommandHandler.sendMessage(player, Grasscutter.getLanguage().Give_given);
+        CommandHandler.sendMessage(player, "now is giving");
 
         List<GameItem> itemList = new ArrayList<>();
         for (ItemData itemdata : GameData.getItemDataMap().values()) {
@@ -53,7 +54,7 @@ public final class GiveAllMaterialCommand implements CommandHandler {
         }
 
         player.getInventory().addItems(itemList);
-        CommandHandler.sendMessage(player, Grasscutter.getLanguage().Success);
+        CommandHandler.sendMessage(player, "success");
     }
 
     public boolean isGatherMaterials(int itemId) {
