@@ -1,6 +1,5 @@
 package emu.grasscutter.command.commands;
 
-import emu.grasscutter.Grasscutter;
 import emu.grasscutter.command.Command;
 import emu.grasscutter.command.CommandHandler;
 import emu.grasscutter.data.GameData;
@@ -20,75 +19,44 @@ public final class GiveAllCharCommand implements CommandHandler {
     public void execute(Player sender, Player targetPlayer, List<String> args) {
         int stellaFortuna = 0;
         int level = 1;
-        int target;
         switch (args.size()) {
 
-            case 1://playerId
-                try {
-                    target = Integer.parseInt(args.get(0));
-                    if (Grasscutter.getGameServer().getPlayerByUid(target) == null) {
-                        CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
-                        return;
-                    }
-                } catch (NumberFormatException ignored) {
-                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
-                    return;
-                }
-                break;
             case 2://playerId ,StellaFortuna
                 try {
-                    target = Integer.parseInt(args.get(0));
-                    if (Grasscutter.getGameServer().getPlayerByUid(target) == null) {
-                        target = sender.getUid();
-                    }
                     stellaFortuna = reviseStellaFortuna(Integer.parseInt(args.get(1)));
                 } catch (NumberFormatException ignored) {
-                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
                     return;
                 }
                 break;
             case 3://playerId ,StellaFortuna ,level
                 try {
-                    target = Integer.parseInt(args.get(0));
-                    if (Grasscutter.getGameServer().getPlayerByUid(target) == null) {
-                        target = sender.getUid();
-                    }
                     stellaFortuna = reviseStellaFortuna(Integer.parseInt(args.get(1)));
                     level = Integer.parseInt(args.get(2));
                 } catch (NumberFormatException ignored) {
-                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
                     return;
                 }
                 break;
             default:
                 if (!Objects.isNull(sender)) {
-                    target = sender.getUid();
                     break;
                 } else
-                    CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Invalid_playerId);
                 return;
 
         }
 
-        Player player = Grasscutter.getGameServer().getPlayerByUid(target);
-        if (player == null) {
-            CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Player_not_found);
-            return;
-        }
+
         for (AvatarData avatarData : GameData.getAvatarDataMap().values()) {
 
             //Exclude test avatar
             if (isTestAvatar(avatarData.getId())) continue;
             Avatar avatar;
             //如果角色存在，则直接修改角色的数据
-            if (player.getAvatars().hasAvatar(avatarData.getId())) {
-                avatar = player.getAvatars().getAvatarById(avatarData.getId());
+            if (targetPlayer.getAvatars().hasAvatar(avatarData.getId())) {
+                avatar = targetPlayer.getAvatars().getAvatarById(avatarData.getId());
                 avatar.setLevel(level);
                 avatar.setPromoteLevel(getPromteLevel(level));
                 avatar.setCoreProudSkillLevel(stellaFortuna);
                 avatar.update();
-                CommandHandler.sendMessage(sender, Grasscutter.getLanguage().GiveAllChar_modify_success
-                        .replace("{AvatarId}", String.valueOf(avatarData.getId())));
             } else {
                 avatar = new Avatar(avatarData);
                 for (int i = 1; i <= 6; ++i) {
@@ -99,7 +67,7 @@ public final class GiveAllCharCommand implements CommandHandler {
                 avatar.setLevel(level);
                 avatar.setPromoteLevel(getPromteLevel(level));
                 avatar.setCoreProudSkillLevel(stellaFortuna);
-                boolean result = player.getAvatars().addAvatar(avatar);
+                boolean result = targetPlayer.getAvatars().addAvatar(avatar);
                 if (!result) {
                     CommandHandler.sendMessage(sender, "Failed to add avatar " + avatar.getAvatarId());
                     continue;
@@ -108,7 +76,7 @@ public final class GiveAllCharCommand implements CommandHandler {
             CommandHandler.sendMessage(sender, "success to add avatar " + avatar.getAvatarId());
 
         }
-        CommandHandler.sendMessage(sender, Grasscutter.getLanguage().Success);
+        CommandHandler.sendMessage(sender, "success");
     }
 
 
