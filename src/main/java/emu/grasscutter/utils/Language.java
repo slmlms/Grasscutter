@@ -15,9 +15,7 @@ public final class Language {
 
     /**
      * Creates a language instance from a code.
-     *
      * @param langCode The language code.
-     *
      * @return A language instance.
      */
     public static Language getLanguage(String langCode) {
@@ -26,10 +24,8 @@ public final class Language {
 
     /**
      * Returns the translated value from the key while substituting arguments.
-     *
-     * @param key  The key of the translated value to return.
+     * @param key The key of the translated value to return.
      * @param args The arguments to substitute.
-     *
      * @return A translated value with arguments substituted.
      */
     public static String translate(String key, Object... args) {
@@ -44,7 +40,6 @@ public final class Language {
 
     /**
      * creates a language instance.
-     *
      * @param fileName The name of the language file.
      */
     private Language(String fileName) {
@@ -63,7 +58,6 @@ public final class Language {
 
     /**
      * Load default language file and creates a language instance.
-     *
      * @return language data
      */
     private JsonObject loadDefaultLanguage() {
@@ -73,14 +67,12 @@ public final class Language {
 
     /**
      * Reads a file and creates a language instance.
-     *
      * @param fileName The name of the language file.
-     *
      * @return language data
      */
     private JsonObject loadLanguage(String fileName) {
         @Nullable JsonObject languageData = null;
-
+        
         try {
             InputStream file = Grasscutter.class.getResourceAsStream("/languages/" + fileName);
             languageData = Grasscutter.getGsonFactory().fromJson(Utils.readFromInputStream(file), JsonObject.class);
@@ -92,16 +84,14 @@ public final class Language {
 
     /**
      * Returns the value (as a string) from a nested key.
-     *
      * @param key The key to look for.
-     *
      * @return The value (as a string) from a nested key.
      */
     public String get(String key) {
-        if (this.cachedTranslations.containsKey(key)) {
+        if(this.cachedTranslations.containsKey(key)) {
             return this.cachedTranslations.get(key);
         }
-
+        
         String[] keys = key.split("\\.");
         JsonObject object = this.languageData;
 
@@ -109,21 +99,19 @@ public final class Language {
         String result = "This value does not exist. Please report this to the Discord: " + key;
 
         while (true) {
-            if (index == keys.length) break;
-
+            if(index == keys.length) break;
+            
             String currentKey = keys[index++];
-            if (object.has(currentKey)) {
+            if(object.has(currentKey)) {
                 JsonElement element = object.get(currentKey);
-                if (element.isJsonObject())
+                if(element.isJsonObject())
                     object = element.getAsJsonObject();
                 else {
-                    result = element.getAsString();
-                    break;
+                    result = element.getAsString(); break;
                 }
             } else break;
         }
-
-        this.cachedTranslations.put(key, result);
-        return result;
+        
+        this.cachedTranslations.put(key, result); return result;
     }
 }

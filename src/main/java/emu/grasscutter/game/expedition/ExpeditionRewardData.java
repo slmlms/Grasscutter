@@ -9,9 +9,7 @@ public class ExpeditionRewardData {
         return itemId;
     }
 
-    public int getMinCount() {
-        return minCount;
-    }
+    public int getMinCount() { return minCount; }
 
     public int getMaxCount() {
         return maxCount;

@@ -18,7 +18,7 @@ public class TowerDungeonSettleListener implements DungeonSettleListener {
                 true,
                 towerManager.hasNextLevel(),
                 towerManager.getNextFloorId()
-        ));
+                ));
 
     }
 }

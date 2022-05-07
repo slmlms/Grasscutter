@@ -17,9 +17,7 @@ public class ExpeditionManager {
 
     private final GameServer gameServer;
 
-    public Int2ObjectMap<List<ExpeditionRewardDataList>> getExpeditionRewardDataList() {
-        return expeditionRewardData;
-    }
+    public Int2ObjectMap<List<ExpeditionRewardDataList>> getExpeditionRewardDataList() { return expeditionRewardData; }
 
     private final Int2ObjectMap<List<ExpeditionRewardDataList>> expeditionRewardData;
 
@@ -33,7 +31,7 @@ public class ExpeditionManager {
         try (FileReader fileReader = new FileReader(Grasscutter.getConfig().DATA_FOLDER + "ExpeditionReward.json")) {
             getExpeditionRewardDataList().clear();
             List<ExpeditionRewardInfo> banners = Grasscutter.getGsonFactory().fromJson(fileReader, TypeToken.getParameterized(Collection.class, ExpeditionRewardInfo.class).getType());
-            if (banners.size() > 0) {
+            if(banners.size() > 0) {
                 for (ExpeditionRewardInfo di : banners) {
                     getExpeditionRewardDataList().put(di.getExpId(), di.getExpeditionRewardDataList());
                 }

@@ -6,7 +6,6 @@ public class ExpeditionRewardDataList {
     public int getHourTime() {
         return hourTime;
     }
-
     public List<ExpeditionRewardData> getExpeditionRewardData() {
         return expeditionRewardData;
     }

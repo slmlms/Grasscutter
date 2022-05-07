@@ -8,23 +8,23 @@ import emu.grasscutter.net.proto.TowerLevelRecordOuterClass.TowerLevelRecord;
 
 public class PacketTowerFloorRecordChangeNotify extends BasePacket {
 
-    public PacketTowerFloorRecordChangeNotify(int floorId) {
-        super(PacketOpcodes.TowerFloorRecordChangeNotify);
+	public PacketTowerFloorRecordChangeNotify(int floorId) {
+		super(PacketOpcodes.TowerFloorRecordChangeNotify);
 
-        TowerFloorRecordChangeNotify proto = TowerFloorRecordChangeNotify.newBuilder()
-                .addTowerFloorRecordList(TowerFloorRecord.newBuilder()
-                        .setFloorId(floorId)
-                        .setFloorStarRewardProgress(3)
-                        .addPassedLevelRecordList(TowerLevelRecord.newBuilder()
-                                .setLevelId(1)
-                                .addSatisfiedCondList(1)
-                                .addSatisfiedCondList(2)
-                                .addSatisfiedCondList(3)
-                                .build())
-                        .build())
-                .setIsFinishedEntranceFloor(true)
-                .build();
-
-        this.setData(proto);
-    }
+		TowerFloorRecordChangeNotify proto = TowerFloorRecordChangeNotify.newBuilder()
+				.addTowerFloorRecordList(TowerFloorRecord.newBuilder()
+						.setFloorId(floorId)
+						.setFloorStarRewardProgress(3)
+						.addPassedLevelRecordList(TowerLevelRecord.newBuilder()
+								.setLevelId(1)
+								.addSatisfiedCondList(1)
+								.addSatisfiedCondList(2)
+								.addSatisfiedCondList(3)
+								.build())
+						.build())
+				.setIsFinishedEntranceFloor(true)
+				.build();
+		
+		this.setData(proto);
+	}
 }
