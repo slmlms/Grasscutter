@@ -1,51 +1,20 @@
 package emu.grasscutter.game.avatar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.bson.types.ObjectId;
-
-import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Indexed;
-import dev.morphia.annotations.PostLoad;
-import dev.morphia.annotations.PrePersist;
-import dev.morphia.annotations.Transient;
+import dev.morphia.annotations.*;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.common.FightPropData;
 import emu.grasscutter.data.custom.OpenConfigEntry;
 import emu.grasscutter.data.custom.OpenConfigEntry.SkillPointModifier;
-import emu.grasscutter.data.def.AvatarData;
-import emu.grasscutter.data.def.AvatarPromoteData;
-import emu.grasscutter.data.def.AvatarSkillData;
-import emu.grasscutter.data.def.AvatarSkillDepotData;
+import emu.grasscutter.data.def.*;
 import emu.grasscutter.data.def.AvatarSkillDepotData.InherentProudSkillOpens;
-import emu.grasscutter.data.def.AvatarTalentData;
-import emu.grasscutter.data.def.EquipAffixData;
 import emu.grasscutter.data.def.ItemData.WeaponProperty;
-import emu.grasscutter.data.def.ProudSkillData;
-import emu.grasscutter.data.def.ReliquaryAffixData;
-import emu.grasscutter.data.def.ReliquaryLevelData;
-import emu.grasscutter.data.def.ReliquaryMainPropData;
-import emu.grasscutter.data.def.ReliquarySetData;
-import emu.grasscutter.data.def.WeaponCurveData;
-import emu.grasscutter.data.def.WeaponPromoteData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.entity.EntityAvatar;
 import emu.grasscutter.game.inventory.EquipType;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.inventory.ItemType;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.game.props.ElementType;
-import emu.grasscutter.game.props.EntityIdType;
-import emu.grasscutter.game.props.FetterState;
-import emu.grasscutter.game.props.FightProperty;
-import emu.grasscutter.game.props.PlayerProperty;
+import emu.grasscutter.game.props.*;
 import emu.grasscutter.net.proto.AvatarFetterInfoOuterClass.AvatarFetterInfo;
 import emu.grasscutter.net.proto.AvatarInfoOuterClass.AvatarInfo;
 import emu.grasscutter.net.proto.AvatarSkillInfoOuterClass.AvatarSkillInfo;
@@ -61,6 +30,10 @@ import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.bson.types.ObjectId;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 @Entity(value = "avatars", useDiscriminator = false)
 public class Avatar {
@@ -901,14 +874,18 @@ public class Avatar {
 
 		return showAvatarInfo.build();
 	}
-	
+
 	@PostLoad
 	private void onLoad() {
-		
+
 	}
-	
+
 	@PrePersist
 	private void prePersist() {
 		this.currentHp = this.getFightProperty(FightProperty.FIGHT_PROP_CUR_HP);
+	}
+
+	public void update() {
+		DatabaseHelper.updateAvatar(this);
 	}
 }
