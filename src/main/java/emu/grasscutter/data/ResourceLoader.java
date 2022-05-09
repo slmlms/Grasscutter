@@ -1,33 +1,27 @@
 package emu.grasscutter.data;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import emu.grasscutter.Grasscutter;
+import emu.grasscutter.data.common.PointData;
+import emu.grasscutter.data.common.ScenePointConfig;
+import emu.grasscutter.data.custom.*;
+import emu.grasscutter.data.custom.AbilityModifier.AbilityConfigData;
+import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierAction;
+import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierActionType;
+import emu.grasscutter.game.world.SpawnDataEntry.SpawnGroupEntry;
+import emu.grasscutter.utils.Utils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import org.reflections.Reflections;
+
 import java.io.File;
 import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.gson.Gson;
-import emu.grasscutter.utils.Utils;
-import org.reflections.Reflections;
-
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-
-import emu.grasscutter.Grasscutter;
-import emu.grasscutter.data.common.PointData;
-import emu.grasscutter.data.common.ScenePointConfig;
-import emu.grasscutter.data.custom.AbilityEmbryoEntry;
-import emu.grasscutter.data.custom.AbilityModifier;
-import emu.grasscutter.data.custom.AbilityModifier.AbilityConfigData;
-import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierAction;
-import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierActionType;
-import emu.grasscutter.data.custom.AbilityModifierEntry;
-import emu.grasscutter.data.custom.OpenConfigEntry;
-import emu.grasscutter.data.custom.ScenePointEntry;
-import emu.grasscutter.game.world.SpawnDataEntry;
-import emu.grasscutter.game.world.SpawnDataEntry.SpawnGroupEntry;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 public class ResourceLoader {
 
@@ -127,7 +121,7 @@ public class ResourceLoader {
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	protected static void loadFromResource(Class<?> c, String fileName, Int2ObjectMap map) throws Exception {
-		FileReader fileReader = new FileReader(Grasscutter.getConfig().RESOURCE_FOLDER + "ExcelBinOutput/" + fileName);
+		FileReader fileReader = new FileReader(Grasscutter.getConfig().RESOURCE_FOLDER + "ExcelBinOutput/" + fileName, StandardCharsets.UTF_8);
 		Gson gson = Grasscutter.getGsonFactory();
 		List list = gson.fromJson(fileReader, List.class);
 

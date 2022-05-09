@@ -1,25 +1,20 @@
 package emu.grasscutter.data.def;
 
-import java.util.Arrays;
-import java.util.List;
-
-import emu.grasscutter.Grasscutter;
-import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.GameResource;
 import emu.grasscutter.data.ResourceType;
-
-import emu.grasscutter.game.props.SceneType;
-
 import emu.grasscutter.data.ResourceType.LoadPriority;
 import emu.grasscutter.data.common.ItemParamData;
 import emu.grasscutter.data.common.ItemParamStringData;
 
+import java.util.Arrays;
+
 @ResourceType(name = "RewardPreviewExcelConfigData.json", loadPriority = LoadPriority.HIGH)
 public class RewardPreviewData extends GameResource {
 	private int Id;
+	private String Desc;
 	private ItemParamStringData[] PreviewItems;
 	private ItemParamData[] PreviewItemsArray;
-	
+
 	@Override
 	public int getId() {
 		return this.Id;
@@ -27,6 +22,10 @@ public class RewardPreviewData extends GameResource {
 
 	public ItemParamData[] getPreviewItems() {
 		return PreviewItemsArray;
+	}
+
+	public String getDesc() {
+		return Desc;
 	}
 
 	@Override

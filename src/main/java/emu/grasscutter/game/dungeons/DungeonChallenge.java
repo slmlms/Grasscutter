@@ -1,7 +1,11 @@
 package emu.grasscutter.game.dungeons;
 
+import emu.grasscutter.Grasscutter;
+import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.common.ItemParamData;
 import emu.grasscutter.data.def.DungeonData;
+import emu.grasscutter.data.def.ItemData;
+import emu.grasscutter.data.def.RewardPreviewData;
 import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.Player;
@@ -16,11 +20,12 @@ import emu.grasscutter.server.packet.send.PacketDungeonChallengeFinishNotify;
 import emu.grasscutter.server.packet.send.PacketGadgetAutoPickDropInfoNotify;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 public class DungeonChallenge {
     private final Scene scene;
@@ -34,6 +39,7 @@ public class DungeonChallenge {
     private int score;
     private int objective = 0;
     private IntSet rewardedPlayers;
+    private final Random random = new Random();
 
     public DungeonChallenge(Scene scene, SceneGroup group) {
         this.scene = scene;
@@ -150,24 +156,79 @@ public class DungeonChallenge {
             return;
         }
 
-        List<GameItem> rewards = new ArrayList<>();
-        List<ItemParamData> previewItems = Arrays.asList(getScene().getDungeonData().getRewardPreview().getPreviewItems());
-        Collections.shuffle(previewItems);
-        int rewardsCount = 0;
-        for (ItemParamData param : previewItems) {
-            if (param.getId() == 102 || param.getId() == 105 || param.getId() == 202) {
-                rewards.add(new GameItem(param.getId(), Math.max(param.getCount(), 1)));
-            } else {
-                if (rewardsCount > 5) continue;
-                rewards.add(new GameItem(param.getId(), Math.max(param.getCount(), 1)));
-                rewardsCount++;
-            }
-
-        }
-
+        RewardPreviewData rewardPreview = getScene().getDungeonData().getRewardPreview();
+        List<GameItem> rewards = getGameItems(rewardPreview, getScene().getDungeonData().getShowLevel());
+        //TODO 后续添加周本、深渊等
+        if (Objects.isNull(rewards)) return;
         player.getInventory().addItems(rewards, ActionReason.DungeonStatueDrop);
         player.sendPacket(new PacketGadgetAutoPickDropInfoNotify(rewards));
 
         getRewardedPlayers().add(player.getUid());
     }
+
+    @Nullable
+    private List<GameItem> getGameItems(RewardPreviewData rewardPreview, int level) {
+        ItemParamData[] previewItems = rewardPreview.getPreviewItems();
+        String desc = rewardPreview.getDesc();
+        if (desc.contains("圣遗物地城")) {
+            return artDungeonList(previewItems, level);
+        } else if (desc.contains("角色技能地城")) {
+            return talentDungeonList(previewItems, level);
+        } else if (desc.contains("武器突破地城")) {
+            return weaponDungeonList(previewItems, level);
+        }
+        return null;
+    }
+
+    private List<GameItem> artDungeonList(ItemParamData[] artList, int level) {
+        //TODO
+
+        List<GameItem> artifacts = new ArrayList<>();
+        for (ItemParamData data : artList) {
+            if (Objects.isNull(data)) continue;
+            if (data.getId() < 100 || data.getId() > 999) continue;
+            if (data.getId() == 102 || data.getId() == 105 || data.getId() == 202) {
+                artifacts.add(new GameItem(data.getId(), Math.max(data.getCount(), 1)));
+                continue;
+            }
+            Grasscutter.getLogger().info(data.toString());
+            //获取圣遗物套装ID，例如724（四星平雷套），结果为72
+            int type = Math.floorDiv(data.getId(), 10);
+            //获取圣遗物星级，结果为4
+            int star = data.getId() - (type * 10);
+            if (type > 51 && type < 99) {
+                for (int i = 1; i <= random.nextInt(data.getCount()) + 1; i++) {
+                    //生成随机圣遗物ID
+                    int itemID = type * 1000
+                            + star * 100
+                            + (random.nextInt(4) + 1) * 10
+                            + (star - (random.nextInt(1) + 1));
+                    //添加到列表里面
+                    ItemData itemData = GameData.getItemDataMap().get(itemID);
+                    Grasscutter.getLogger().info("scene id:" + getScene().getId() + "\tart id" + itemID);
+                    if (Objects.isNull(itemData)) continue;
+                    artifacts.add(new GameItem(itemData, i));
+                }
+            }
+        }
+        return artifacts;
+    }
+
+    private List<GameItem> weaponDungeonList(ItemParamData[] wapList, int level) {
+        List<GameItem> weaponList = new ArrayList<>();
+        for (ItemParamData itemParamData : wapList) {
+            if (itemParamData.getId() == 102 || itemParamData.getId() == 105 || itemParamData.getId() == 202) {
+                weaponList.add(new GameItem(itemParamData.getId(), Math.max(itemParamData.getCount(), 1)));
+            }
+            weaponList.add(new GameItem(itemParamData.getId(), new Random().nextInt(itemParamData.getCount()) + 1));
+        }
+        return weaponList;
+    }
+
+    private List<GameItem> talentDungeonList(ItemParamData[] talList, int level) {
+        //TODO
+        return null;
+    }
+
+
 }
