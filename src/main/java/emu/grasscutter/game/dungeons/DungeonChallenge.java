@@ -22,10 +22,8 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class DungeonChallenge {
     private final Scene scene;
@@ -40,6 +38,7 @@ public class DungeonChallenge {
     private int objective = 0;
     private IntSet rewardedPlayers;
     private final Random random = new Random();
+
 
     public DungeonChallenge(Scene scene, SceneGroup group) {
         this.scene = scene;
@@ -231,9 +230,48 @@ public class DungeonChallenge {
             if (itemParamData.getId() == 102 || itemParamData.getId() == 105 || itemParamData.getId() == 202) {
                 weaponList.add(new GameItem(itemParamData.getId(), Math.max(itemParamData.getCount(), 1)));
             }
-            weaponList.add(new GameItem(itemParamData.getId(), new Random().nextInt(itemParamData.getCount()) + 1));
+            if (itemParamData.getId() < 114001 || itemParamData.getId() > 114099) continue;
+            int[] weaponDayMaterials = getWeaponDayMaterial(itemParamData.getId(), level);
+            if (weaponList.size() == 0) continue;
+            for (int i : weaponDayMaterials) {
+                ItemData itemData = GameData.getItemDataMap().get(i);
+                if (Objects.isNull(itemData)) continue;
+                weaponList.add(new GameItem(itemData, new Random().nextInt(itemParamData.getCount()) + 1));
+            }
         }
         return weaponList;
+    }
+
+
+    /**
+     * @param baseWeaponMatId 该副本的材料ID的最小值，例如武器材料“高塔孤王的破瓦”114001,其他的不用管
+     *                        <p>
+     *                        根据每周天数轮换武器材料，星期天全给
+     * @param level           showLevel
+     *
+     * @return 材料
+     */
+    private int[] getWeaponDayMaterial(int baseWeaponMatId, int level) {
+        Calendar calendar = new GregorianCalendar();
+        var dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int materialLevel = 0;
+        switch (level) {
+            case 15 -> materialLevel = 3;
+            case 36 -> materialLevel = 2;
+            case 59 -> materialLevel = 1;
+            case 80 -> materialLevel = 0;
+        }
+
+        if (dayOfWeek > 0 && dayOfWeek < 4) {
+            return IntStream.range(baseWeaponMatId + (dayOfWeek * 4) - 4, baseWeaponMatId + (dayOfWeek * 4) - 1 - materialLevel).toArray();
+        }
+
+        if (dayOfWeek > 3 && dayOfWeek < 7) {
+            dayOfWeek = dayOfWeek - 3;
+            return IntStream.range(baseWeaponMatId + (dayOfWeek * 4) - 4, baseWeaponMatId + (dayOfWeek * 4) - 1 - materialLevel).toArray();
+        }
+
+        return IntStream.range(baseWeaponMatId, baseWeaponMatId + (Math.floorDiv(dayOfWeek, 4)) - 1 - materialLevel).toArray();
     }
 
     private List<GameItem> talentDungeonList(ItemParamData[] talList, int level) {
