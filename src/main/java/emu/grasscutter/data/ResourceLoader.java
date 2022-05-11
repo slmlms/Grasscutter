@@ -1,27 +1,34 @@
 package emu.grasscutter.data;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-import emu.grasscutter.Grasscutter;
-import emu.grasscutter.data.common.PointData;
-import emu.grasscutter.data.common.ScenePointConfig;
-import emu.grasscutter.data.custom.*;
-import emu.grasscutter.data.custom.AbilityModifier.AbilityConfigData;
-import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierAction;
-import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierActionType;
-import emu.grasscutter.game.world.SpawnDataEntry.SpawnGroupEntry;
-import emu.grasscutter.utils.Utils;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import org.reflections.Reflections;
-
 import java.io.File;
 import java.io.FileReader;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
+import emu.grasscutter.utils.Utils;
+import org.reflections.Reflections;
+
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+
+import emu.grasscutter.Grasscutter;
+import emu.grasscutter.data.common.PointData;
+import emu.grasscutter.data.common.ScenePointConfig;
+import emu.grasscutter.data.custom.AbilityEmbryoEntry;
+import emu.grasscutter.data.custom.AbilityModifier;
+import emu.grasscutter.data.custom.AbilityModifier.AbilityConfigData;
+import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierAction;
+import emu.grasscutter.data.custom.AbilityModifier.AbilityModifierActionType;
+import emu.grasscutter.data.custom.AbilityModifierEntry;
+import emu.grasscutter.data.custom.OpenConfigEntry;
+import emu.grasscutter.data.custom.ScenePointEntry;
+import emu.grasscutter.game.world.SpawnDataEntry.*;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+
+import static emu.grasscutter.Configuration.*;
 
 public class ResourceLoader {
 
@@ -121,7 +128,7 @@ public class ResourceLoader {
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	protected static void loadFromResource(Class<?> c, String fileName, Int2ObjectMap map) throws Exception {
-		FileReader fileReader = new FileReader(Grasscutter.getConfig().RESOURCE_FOLDER + "ExcelBinOutput/" + fileName, StandardCharsets.UTF_8);
+		FileReader fileReader = new FileReader(RESOURCE("ExcelBinOutput/" + fileName));
 		Gson gson = Grasscutter.getGsonFactory();
 		List list = gson.fromJson(fileReader, List.class);
 
@@ -135,7 +142,7 @@ public class ResourceLoader {
 
 	private static void loadScenePoints() {
 		Pattern pattern = Pattern.compile("(?<=scene)(.*?)(?=_point.json)");
-		File folder = new File(Grasscutter.getConfig().RESOURCE_FOLDER + "BinOutput/Scene/Point");
+		File folder = new File(RESOURCE("BinOutput/Scene/Point"));
 
 		if (!folder.isDirectory() || !folder.exists() || folder.listFiles() == null) {
 			Grasscutter.getLogger().error("Scene point files cannot be found, you cannot use teleport waypoints!");
@@ -144,8 +151,7 @@ public class ResourceLoader {
 
 		List<ScenePointEntry> scenePointList = new ArrayList<>();
 		for (File file : Objects.requireNonNull(folder.listFiles())) {
-			ScenePointConfig config = null;
-			Integer sceneId = null;
+			ScenePointConfig config; Integer sceneId;
 			
 			Matcher matcher = pattern.matcher(file.getName());
 			if (matcher.find()) {
@@ -184,7 +190,7 @@ public class ResourceLoader {
 
 	private static void loadAbilityEmbryos() {
 		// Read from cached file if exists
-		File embryoCache = new File(Grasscutter.getConfig().DATA_FOLDER + "AbilityEmbryos.json");
+		File embryoCache = new File(DATA("AbilityEmbryos.json"));
 		List<AbilityEmbryoEntry> embryoList = null;
 		
 		if (embryoCache.exists()) {
@@ -199,7 +205,7 @@ public class ResourceLoader {
 			Pattern pattern = Pattern.compile("(?<=ConfigAvatar_)(.*?)(?=.json)");
 
 			embryoList = new LinkedList<>();
-			File folder = new File(Utils.toFilePath(Grasscutter.getConfig().RESOURCE_FOLDER + "BinOutput/Avatar/"));
+			File folder = new File(Utils.toFilePath(RESOURCE("BinOutput/Avatar/")));
 			File[] files = folder.listFiles();
 			if(files == null) {
 				Grasscutter.getLogger().error("Error loading ability embryos: no files found in " + folder.getAbsolutePath());
@@ -246,7 +252,7 @@ public class ResourceLoader {
 	
 	private static void loadAbilityModifiers() {
 		// Load from BinOutput
-		File folder = new File(Utils.toFilePath(Grasscutter.getConfig().RESOURCE_FOLDER + "BinOutput/Ability/Temp/AvatarAbilities/"));
+		File folder = new File(Utils.toFilePath(RESOURCE("BinOutput/Ability/Temp/AvatarAbilities/")));
 		File[] files = folder.listFiles();
 		if (files == null) {
 			Grasscutter.getLogger().error("Error loading ability modifiers: no files found in " + folder.getAbsolutePath());
@@ -254,7 +260,7 @@ public class ResourceLoader {
 		}
 
 		for (File file : files) {
-			List<AbilityConfigData> abilityConfigList = null;
+			List<AbilityConfigData> abilityConfigList;
 			
 			try (FileReader fileReader = new FileReader(file)) {
 				abilityConfigList = Grasscutter.getGsonFactory().fromJson(fileReader, TypeToken.getParameterized(Collection.class, AbilityConfigData.class).getType());
@@ -309,7 +315,7 @@ public class ResourceLoader {
 	
 	private static void loadSpawnData() {
 		// Read from cached file if exists
-		File spawnDataEntries = new File(Grasscutter.getConfig().DATA_FOLDER + "Spawns.json");
+		File spawnDataEntries = new File(DATA("Spawns.json"));
 		List<SpawnGroupEntry> spawnEntryList = null;
 		
 		if (spawnDataEntries.exists()) {
@@ -327,16 +333,14 @@ public class ResourceLoader {
 		}
 
 		for (SpawnGroupEntry entry : spawnEntryList) {
-			entry.getSpawns().stream().forEach(s -> {
-				s.setGroup(entry);
-			});
+			entry.getSpawns().forEach(s -> s.setGroup(entry));
 			GameDepot.getSpawnListById(entry.getSceneId()).insert(entry, entry.getPos().getX(), entry.getPos().getZ());
 		}
 	}
 	
 	private static void loadOpenConfig() {
 		// Read from cached file if exists
-		File openConfigCache = new File(Grasscutter.getConfig().DATA_FOLDER + "OpenConfig.json");
+		File openConfigCache = new File(DATA("OpenConfig.json"));
 		List<OpenConfigEntry> list = null;
 		
 		if (openConfigCache.exists()) {
@@ -351,7 +355,7 @@ public class ResourceLoader {
 			String[] folderNames = {"BinOutput/Talent/EquipTalents/", "BinOutput/Talent/AvatarTalents/"};
 			
 			for (String name : folderNames) {
-				File folder = new File(Utils.toFilePath(Grasscutter.getConfig().RESOURCE_FOLDER + name));
+				File folder = new File(Utils.toFilePath(RESOURCE(name)));
 				File[] files = folder.listFiles();
 				if(files == null) {
 					Grasscutter.getLogger().error("Error loading open config: no files found in " + folder.getAbsolutePath()); return;
